@@ -1,0 +1,32 @@
+type User @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  username: String!
+  name: String
+  bio: String
+  avatar: String
+  website: String
+  location: String
+  posts: [Post] @hasMany(indexName: "byUser", fields: ["id"])
+  comments: [Comment] @hasMany(indexName: "byUser", fields: ["id"])
+  createdAt: AWSDateTime
+}
+
+type Post @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  content: String
+  mediaUrl: String
+  userID: ID! @index(name: "byUser")
+  user: User @belongsTo(fields: ["userID"])
+  comments: [Comment] @hasMany(indexName: "byPost", fields: ["id"])
+  createdAt: AWSDateTime
+}
+
+type Comment @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  content: String!
+  postID: ID! @index(name: "byPost")
+  userID: ID! @index(name: "byUser")
+  post: Post @belongsTo(fields: ["postID"])
+  user: User @belongsTo(fields: ["userID"])
+  createdAt: AWSDateTime
+}
